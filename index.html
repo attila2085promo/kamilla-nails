@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kamilla Nails – Műköröm Zalaegerszeg</title>
+
+  <!-- Google Fonts – elegáns betűtípusok -->
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+
+  <!-- Saját stíluslap -->
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <!-- ============================
+       NAVIGÁCIÓ / FEJLÉC
+       ============================ -->
+  <header>
+    <div class="nav-container">
+
+      <!-- Logó -->
+      <div class="logo">
+  <img src="img/logo.png" alt="Kamilla Nails logó">
+  <span class="logo-text">Kamilla Nails</span>
+</div>
+
+
+
+      <!-- Navigációs menü -->
+      <nav>
+        <a href="#services">Szolgáltatások</a>
+        <a href="#prices">Árak</a>
+        <a href="#gallery">Galéria</a>
+        <a href="#booking">Időpontfoglalás</a>
+        <a href="#contact">Kapcsolat</a>
+      </nav>
+
+      <div class="hamburger">
+  <span></span>
+  <span></span>
+  <span></span>
+</div>
+
+
+    </div>
+  </header>
+
+  <!-- ============================
+       HERO SZEKCIÓ (nyitókép)
+       ============================ -->
+  <section id="hero">
+    <div class="hero-content">
+      <h1>Elegancia a körmeidben</h1>
+      <p>Professzionális műköröm szolgáltatások Zalaegerszegen</p>
+      <a href="#booking" class="hero-btn">Időpontfoglalás</a>
+    </div>
+  </section>
+
+  <!-- ============================
+       SZOLGÁLTATÁSOK
+       ============================ -->
+  <section id="services">
+    <h2>Szolgáltatások</h2>
+
+    <div class="services-container">
+
+      <!-- Szolgáltatás kártya -->
+      <div class="service-card">
+        <h3>Géllakk</h3>
+        <p>Időtartam: 60 perc</p>
+      </div>
+
+      <div class="service-card">
+        <h3>Zselés építés</h3>
+        <p>Időtartam: 120 perc</p>
+      </div>
+
+      <div class="service-card">
+        <h3>Töltés</h3>
+        <p>Időtartam: 90 perc</p>
+      </div>
+
+      <div class="service-card">
+        <h3>Erősített gél</h3>
+        <p>Időtartam: 75 perc</p>
+      </div>
+
+      <div class="service-card">
+        <h3>Manikűr</h3>
+        <p>Időtartam: 45 perc</p>
+      </div>
+
+      <div class="service-card">
+        <h3>Pedikűr</h3>
+        <p>Időtartam: 60 perc</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============================
+       ÁRAK
+       ============================ -->
+  <section id="prices">
+    <h2>Árak</h2>
+
+    <div class="prices-container">
+
+      <div class="price-card">
+        <h3>Géllakk</h3>
+        <p>5 500 Ft</p>
+      </div>
+
+      <div class="price-card">
+        <h3>Zselés építés</h3>
+        <p>9 500 Ft</p>
+      </div>
+
+      <div class="price-card">
+        <h3>Töltés</h3>
+        <p>7 500 Ft</p>
+      </div>
+
+      <div class="price-card">
+        <h3>Erősített gél</h3>
+        <p>6 500 Ft</p>
+      </div>
+
+      <div class="price-card">
+        <h3>Manikűr</h3>
+        <p>4 000 Ft</p>
+      </div>
+
+      <div class="price-card">
+        <h3>Pedikűr</h3>
+        <p>6 000 Ft</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============================
+       GALÉRIA
+       ============================ -->
+  <section id="gallery">
+    <h2>Galéria</h2>
+
+    <div class="gallery-container">
+      <!-- Ide jönnek a képek -->
+      <img src="img/1.jpg" alt="">
+      <img src="img/2.jpg" alt="">
+      <img src="img/3.jpg" alt="">
+      <img src="img/4.jpg" alt="">
+      <img src="img/5.jpg" alt="">
+      <img src="img/6.jpg" alt="">
+    </div>
+  </section>
+
+  <!-- ============================
+       IDŐPONTFOGLALÁS
+       ============================ -->
+  <section id="booking">
+    <h2>Időpontfoglalás</h2>
+
+    <div class="booking-container">
+
+      <!-- 1. Szolgáltatás -->
+      <div class="booking-step">
+        <h3>1. Szolgáltatás kiválasztása</h3>
+        <select id="serviceSelect">
+          <option value="">Válassz szolgáltatást...</option>
+          <option value="60">Géllakk (60 perc)</option>
+          <option value="120">Zselés építés (120 perc)</option>
+          <option value="90">Töltés (90 perc)</option>
+          <option value="75">Erősített gél (75 perc)</option>
+          <option value="45">Manikűr (45 perc)</option>
+          <option value="60">Pedikűr (60 perc)</option>
+        </select>
+      </div>
+
+      <!-- 2. Dátum -->
+      <div class="booking-step">
+        <h3>2. Dátum kiválasztása</h3>
+        <input type="date" id="dateSelect">
+      </div>
+
+      <!-- 3. Időpont -->
+      <div class="booking-step">
+        <h3>3. Időpont kiválasztása</h3>
+        <div id="timeSlots"></div>
+      </div>
+
+      <!-- 4. Vendég adatai -->
+      <div class="booking-step">
+        <h3>4. Vendég adatai</h3>
+        <input type="text" id="clientName" placeholder="Név">
+        <input type="email" id="clientEmail" placeholder="Email cím">
+        <input type="tel" id="clientPhone" placeholder="Telefonszám (opcionális)">
+      </div>
+
+      <!-- Foglalás gomb -->
+      <button id="bookBtn">Foglalás</button>
+      <p id="bookingMessage"></p>
+
+    </div>
+  </section>
+
+  <!-- ============================
+       KAPCSOLAT
+       ============================ -->
+  <section id="contact">
+    <h2>Kapcsolat</h2>
+
+    <div class="contact-container">
+
+      <div class="contact-item">
+        <h3>Cím</h3>
+        <p>Zalaegerszeg</p>
+      </div>
+
+      <div class="contact-item">
+        <h3>Telefon</h3>
+        <a href="tel:+36301234567">+36 30 123 4567</a>
+      </div>
+
+      <div class="contact-item">
+        <h3>Email</h3>
+        <a href="mailto:info@kamillanails.hu">info@kamillanails.hu</a>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============================
+       JAVASCRIPT
+       ============================ -->
+  <script src="app.js"></script>
+
+</body>
+</html>

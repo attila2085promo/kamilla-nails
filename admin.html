@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin – Foglalások kezelése</title>
+
+  <style>
+    /* Alap stílusok az admin oldalhoz */
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #b8860b;
+    }
+
+    /* Táblázat stílus */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 30px;
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    th, td {
+      padding: 12px;
+      border-bottom: 1px solid #ddd;
+      text-align: center;
+    }
+
+    th {
+      background: #b8860b;
+      color: white;
+    }
+
+    tr:hover {
+      background: #f0e6c8;
+    }
+
+    /* Gombok stílusa */
+    button {
+      padding: 8px 12px;
+      background: #c0392b;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #e74c3c;
+    }
+
+    /* Szűrőmezők konténere */
+    #filters {
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    #filters input,
+    #filters select {
+      padding: 8px;
+      margin: 5px;
+      border: 2px solid #b8860b;
+      border-radius: 5px;
+    }
+
+    #noBookings {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 18px;
+      color: #555;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ADMIN JELSZÓVÉDELEM -->
+  <script>
+    // Egyszerű jelszó, amit később átírhatsz
+    const password = "kamilla123";
+
+    // Bekéri a jelszót
+    const userPass = prompt("Add meg az admin jelszót:");
+
+    // Ha rossz → visszadob az index oldalra
+    if (userPass !== password) {
+      alert("Hibás jelszó!");
+      window.location.href = "index.html";
+    }
+  </script>
+
+  <h1>Foglalások kezelése</h1>
+
+  <!-- SZŰRŐK -->
+  <div id="filters">
+    <!-- Dátum szerinti szűrés -->
+    <input type="date" id="filterDate">
+
+    <!-- Név szerinti keresés -->
+    <input type="text" id="filterName" placeholder="Név keresése">
+
+    <!-- Szolgáltatás szerinti szűrés -->
+    <select id="filterService">
+      <option value="">Összes szolgáltatás</option>
+      <option value="60">Géllakk</option>
+      <option value="120">Zselés építés</option>
+      <option value="90">Töltés</option>
+      <option value="75">Erősített gél</option>
+      <option value="45">Manikűr</option>
+      <option value="60">Pedikűr</option>
+    </select>
+  </div>
+
+  <!-- FOGALÁSOK TÁBLÁZATA -->
+  <table id="bookingTable">
+    <thead>
+      <tr>
+        <th>Név</th>
+        <th>Email</th>
+        <th>Telefon</th>
+        <th>Dátum</th>
+        <th>Időpont</th>
+        <th>Időtartam</th>
+        <th>Művelet</th>
+      </tr>
+    </thead>
+    <tbody id="bookingBody"></tbody>
+  </table>
+
+  <!-- Üzenet, ha nincs foglalás -->
+  <p id="noBookings" style="display:none;">Nincs egyetlen foglalás sem.</p>
+
+  <script>
+    // Szűrőmezők lekérése
+    const filterDate = document.getElementById("filterDate");
+    const filterName = document.getElementById("filterName");
+    const filterService = document.getElementById("filterService");
+
+    // Szűrők eseményfigyelői
+    filterDate.addEventListener("change", loadBookings);
+    filterName.addEventListener("input", loadBookings);
+    filterService.addEventListener("change", loadBookings);
+
+    // Foglalások betöltése és megjelenítése
+    function loadBookings() {
+      const bookingBody = document.getElementById("bookingBody");
+      const noBookings = document.getElementById("noBookings");
+
+      // Foglalások betöltése LocalStorage-ből
+      let bookings = JSON.parse(localStorage.getItem("bookings")) || [];
+
+      bookingBody.innerHTML = "";
+
+      // SZŰRÉS alkalmazása
+      let filtered = bookings.filter(b => {
+        if (filterDate.value && b.date !== filterDate.value) return false;
+        if (filterName.value && !b.name.toLowerCase().includes(filterName.value.toLowerCase())) return false;
+        if (filterService.value && b.duration != filterService.value) return false;
+        return true;
+      });
+
+      // Ha nincs foglalás → üzenet
+      if (filtered.length === 0) {
+        noBookings.style.display = "block";
+        return;
+      }
+
+      noBookings.style.display = "none";
+
+      // Táblázat feltöltése
+      filtered.forEach((b, index) => {
+        const row = document.createElement("tr");
+
+        row.innerHTML = `
+          <td>${b.name}</td>
+          <td>${b.email}</td>
+          <td>${b.phone || "-"}</td>
+          <td>${b.date}</td>
+          <td>${b.time}</td>
+          <td>${b.duration} perc</td>
+          <td>
+            <button onclick="editBooking(${index})">Szerkesztés</button>
+            <button onclick="deleteBooking(${index})">Törlés</button>
+          </td>
+        `;
+
+        bookingBody.appendChild(row);
+      });
+    }
+
+    // Foglalás törlése
+    function deleteBooking(index) {
+      let bookings = JSON.parse(localStorage.getItem("bookings")) || [];
+
+      bookings.splice(index, 1); // törlés
+
+      localStorage.setItem("bookings", JSON.stringify(bookings));
+
+      loadBookings(); // frissítés
+    }
+
+    // Foglalás szerkesztése
+    function editBooking(index) {
+      let bookings = JSON.parse(localStorage.getItem("bookings")) || [];
+      let b = bookings[index];
+
+      // Adatok bekérése
+      const newName = prompt("Név:", b.name);
+      const newEmail = prompt("Email:", b.email);
+      const newPhone = prompt("Telefon:", b.phone);
+      const newDate = prompt("Dátum (YYYY-MM-DD):", b.date);
+      const newTime = prompt("Időpont (HH:00):", b.time);
+
+      // Validáció
+      if (!newName || !newEmail || !newDate || !newTime) {
+        alert("Minden mező kötelező!");
+        return;
+      }
+
+      // Módosított foglalás mentése
+      bookings[index] = {
+        ...b,
+        name: newName,
+        email: newEmail,
+        phone: newPhone,
+        date: newDate,
+        time: newTime
+      };
+
+      localStorage.setItem("bookings", JSON.stringify(bookings));
+
+      loadBookings(); // frissítés
+    }
+
+    // Oldal betöltésekor foglalások megjelenítése
+    loadBookings();
+  </script>
+
+</body>
+</html>

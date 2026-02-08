@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin – Naptár nézet</title>
+
+  <style>
+    /* Alap stílusok */
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #b8860b;
+    }
+
+    /* Naptár konténer */
+    #calendar {
+      max-width: 900px;
+      margin: 30px auto;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    /* Hónap fejléce */
+    #monthHeader {
+      text-align: center;
+      font-size: 24px;
+      margin-bottom: 20px;
+      color: #b8860b;
+    }
+
+    /* Naptár rács */
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 10px;
+    }
+
+    /* Nap cellák */
+    .day {
+      background: #fff8e1;
+      border: 2px solid #b8860b;
+      border-radius: 8px;
+      padding: 10px;
+      min-height: 120px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .day:hover {
+      background: #f0e6c8;
+    }
+
+    /* Üres napok (hónap elején) */
+    .empty {
+      background: transparent;
+      border: none;
+      cursor: default;
+    }
+
+    /* Foglalások listája a napban */
+    .booking-item {
+      background: #b8860b;
+      color: white;
+      padding: 4px;
+      margin-top: 5px;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+
+    /* Popup háttér */
+    #popupBg {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5);
+    }
+
+    /* Popup ablak */
+    #popup {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      width: 300px;
+    }
+
+    #popup h3 {
+      margin-top: 0;
+      color: #b8860b;
+    }
+
+    #closePopup {
+      margin-top: 10px;
+      padding: 8px;
+      width: 100%;
+      background: #b8860b;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ADMIN JELSZÓVÉDELEM -->
+  <script>
+    const password = "kamilla123";
+    const userPass = prompt("Add meg az admin jelszót:");
+    if (userPass !== password) {
+      alert("Hibás jelszó!");
+      window.location.href = "index.html";
+    }
+  </script>
+
+  <h1>Foglalások – Naptár nézet</h1>
+
+  <!-- Hónap neve -->
+  <div id="monthHeader"></div>
+
+  <!-- Naptár konténer -->
+  <div id="calendar"></div>
+
+  <!-- Popup a napi foglalásokhoz -->
+  <div id="popupBg">
+    <div id="popup">
+      <h3>Napi foglalások</h3>
+      <div id="popupContent"></div>
+      <button id="closePopup">Bezárás</button>
+    </div>
+  </div>
+
+  <script>
+    /* ============================
+       NAPTÁR GENERÁLÁSA
+       ============================ */
+
+    const calendar = document.getElementById("calendar");
+    const monthHeader = document.getElementById("monthHeader");
+
+    // Aktuális dátum
+    const today = new Date();
+    let currentMonth = today.getMonth();
+    let currentYear = today.getFullYear();
+
+    // Foglalások betöltése
+    let bookings = JSON.parse(localStorage.getItem("bookings")) || [];
+
+    // Hónapok nevei
+    const months = [
+      "Január", "Február", "Március", "Április", "Május", "Június",
+      "Július", "Augusztus", "Szeptember", "Október", "November", "December"
+    ];
+
+    // Naptár kirajzolása
+    function renderCalendar() {
+      calendar.innerHTML = ""; // törlés
+      monthHeader.textContent = `${months[currentMonth]} ${currentYear}`;
+
+      const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+      const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+
+      const grid = document.createElement("div");
+      grid.classList.add("calendar-grid");
+
+      // Üres cellák a hónap elején
+      for (let i = 0; i < (firstDay === 0 ? 6 : firstDay - 1); i++) {
+        const empty = document.createElement("div");
+        empty.classList.add("empty");
+        grid.appendChild(empty);
+      }
+
+      // Napok generálása
+      for (let day = 1; day <= daysInMonth; day++) {
+        const cell = document.createElement("div");
+        cell.classList.add("day");
+        cell.innerHTML = `<strong>${day}</strong>`;
+
+        const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+
+        // Foglalások keresése erre a napra
+        const dayBookings = bookings.filter(b => b.date === dateStr);
+
+        // Foglalások megjelenítése a cellában
+        dayBookings.forEach(b => {
+          const item = document.createElement("div");
+          item.classList.add("booking-item");
+          item.textContent = `${b.time} – ${b.name}`;
+          cell.appendChild(item);
+        });
+
+        // Kattintás → popup
+        cell.addEventListener("click", () => openPopup(dateStr));
+
+        grid.appendChild(cell);
+      }
+
+      calendar.appendChild(grid);
+    }
+
+    /* ============================
+       POPUP – NAPI FOGALÁSOK
+       ============================ */
+
+    const popupBg = document.getElementById("popupBg");
+    const popupContent = document.getElementById("popupContent");
+    const closePopup = document.getElementById("closePopup");
+
+    function openPopup(date) {
+      popupContent.innerHTML = "";
+
+      const dayBookings = bookings.filter(b => b.date === date);
+
+      if (dayBookings.length === 0) {
+        popupContent.innerHTML = "<p>Nincs foglalás ezen a napon.</p>";
+      } else {
+        dayBookings.forEach(b => {
+          popupContent.innerHTML += `
+            <p><strong>${b.time}</strong> – ${b.name} (${b.email})</p>
+          `;
+        });
+      }
+
+      popupBg.style.display = "block";
+    }
+
+    closePopup.addEventListener("click", () => {
+      popupBg.style.display = "none";
+    });
+
+    // Naptár megjelenítése
+    renderCalendar();
+  </script>
+
+</body>
+</html>
